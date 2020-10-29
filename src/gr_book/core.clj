@@ -41,6 +41,14 @@
 
 
 (defn node->text [node]
+
+  (str/join
+   (for [node* (:content node)]
+     (if (string? node*)
+       (str/trim node*)
+       (node->text node*))))
+
+  #_
   (-> node :content str/join str/trim))
 
 
@@ -49,15 +57,33 @@
           (find-first sel-msg-text)
           node->text))
 
+
+(defn capitalize-first [text]
+
+  (cond
+
+    (str/starts-with? text "http")
+    text
+
+    :else
+    (str (-> text first str/upper-case)
+         (-> text (subs 1)))))
+
+
 (defn complete-dot [text]
   (if (str/ends-with? text ".")
     text
     (str text ".")))
 
+
+(defn improve-text [text]
+  (-> text complete-dot capitalize-first))
+
+
 (defn join-replics [replics]
   (str/join " "
             (->> replics
-                 (map str/capitalize)
+                 (map capitalize-first)
                  (map complete-dot))))
 
 
@@ -119,6 +145,25 @@
 (defn block->paragraph
   [{:keys [head tail]}]
   (join-replics (cons (get-text head) (map get-text tail))))
+
+
+
+(defn render-block [{:keys [head tail]}]
+
+  (let [from-name (find-from-name head)]
+
+    (with-out-str
+
+      (print (format "\\AUTHOR{%s} " from-name))
+      (print (-> head get-text improve-text))
+
+      (print \space)
+
+      (doseq [msg tail]
+        (print (-> msg get-text improve-text))
+        (print \space))
+
+      (println))))
 
 
 #_
