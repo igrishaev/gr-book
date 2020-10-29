@@ -70,6 +70,10 @@
          (-> text (subs 1)))))
 
 
+(defn escape-percent [text]
+  (str/replace text #"%" "\\\\%"))
+
+
 (defn complete-dot [text]
   (if (str/ends-with? text ".")
     text
@@ -77,7 +81,9 @@
 
 
 (defn improve-text [text]
-  (-> text complete-dot capitalize-first))
+  (-> text complete-dot
+      capitalize-first
+      escape-percent))
 
 
 (defn join-replics [replics]
@@ -152,18 +158,35 @@
 
   (let [from-name (find-from-name head)]
 
-    (with-out-str
+    (print (format "\\AUTHOR{%s} " from-name))
 
-      (print (format "\\AUTHOR{%s} " from-name))
-      (print (-> head get-text improve-text))
+    (some-> head get-text improve-text print)
 
-      (print \space)
+    (print \space)
 
-      (doseq [msg tail]
-        (print (-> msg get-text improve-text))
-        (print \space))
+    (doseq [msg tail]
+      (print (some-> msg get-text improve-text))
+      (print \space))
 
-      (println))))
+    (println)))
+
+
+(defn render-blocks [blocks]
+  (doseq [block blocks]
+    (println (render-block block))))
+
+
+(defn render-document [blocks]
+  (-> "latex/header.tex" slurp println)
+  (render-blocks blocks)
+  (-> "latex/footer.tex" slurp println))
+
+
+(defn write-doc [blocks]
+  (spit "latex/out.tex"
+        (with-out-str
+          (render-document blocks))))
+
 
 
 #_

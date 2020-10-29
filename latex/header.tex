@@ -1,0 +1,25 @@
+\documentclass[10pt]{book}
+
+\usepackage[T2A]{fontenc}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+\geometry{
+  marginparwidth=12mm,
+  papersize={145mm,205mm}, % 145x205 no bleed
+  top    = 15mm,           %
+  right  = 17mm,           %
+  bottom = 25mm,           %
+  left   = 23mm            %
+}
+
+\usepackage[hyperindex=false]{hyperref}
+
+\setlength{\parskip}{0.32em}
+
+\newcommand{\AUTHOR}[1]{\emph{#1}:}
+
+\newenvironment{teaser}{\vspace{-3em}\slshape}{\vspace{1em}}
+
+\begin{document}
